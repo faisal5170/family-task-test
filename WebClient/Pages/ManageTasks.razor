@@ -1,5 +1,4 @@
 @page "/manage-tasks"
-@inherits TasksBase
 @inject HttpClient http
 @using Domain.ViewModel
 @using WebClient.Abstractions
@@ -27,9 +26,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-10 offset-1">
+                @*<div class="col-10 offset-1">
                     <TaskListerComponent />
-                </div>
+                </div>*@
             }
             @if (false)
             {
@@ -54,16 +53,17 @@
     {
         showLister = true;
         isLoaded = true;
+        task = new TaskVm();
         return base.OnInitializedAsync();
     }
 
 
     private void OnAddItem()
     {
-        if (memberService.SelectedMember != null)
-        {
-            task.AssignedToId = memberService.SelectedMember.Id;
-        }
+        //if (memberService.SelectedMember != null)
+        //{
+        //    task.AssignedToId = memberService.SelectedMember.Id;
+        //}
         taskDataService.CreateTask(task);
         StateHasChanged();
     }

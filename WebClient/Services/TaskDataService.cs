@@ -14,15 +14,15 @@ using Core.Extensions.ModelConversion;
 
 namespace WebClient.Services
 {
-    public class TaskDataService: ITaskDataService
-    {    
+    public class TaskDataService : ITaskDataService
+    {
 
         private readonly HttpClient httpClient;
         public TaskDataService(IHttpClientFactory clientFactory)
         {
             httpClient = clientFactory.CreateClient("FamilyTaskAPI");
             tasks = new List<TaskVm>();
-            LoadTasks();
+            // LoadTasks();
         }
         private IEnumerable<TaskVm> tasks;
 
