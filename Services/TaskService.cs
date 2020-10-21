@@ -26,17 +26,24 @@ namespace Services
 
         public async Task<CreateTaskCommandResult> CreateTaskCommandHandler(CreateTaskCommand command)
         {
-            var task = _mapper.Map<Domain.DataModels.Task>(command);
-            var persistedMember = await _taskRepository.CreateRecordAsync(task);
-
-            var vm = _mapper.Map<TaskVm>(persistedMember);
-
-            return new CreateTaskCommandResult()
+            try
             {
-                Payload = vm
-            };
-        }        
-      
+                var task = _mapper.Map<Domain.DataModels.Task>(command);
+                var persistedMember = await _taskRepository.CreateRecordAsync(task);
+
+                var vm = _mapper.Map<TaskVm>(persistedMember);
+                return new CreateTaskCommandResult()
+                {
+                    Payload = vm
+                };
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
         public async Task<GetAllTasksQueryResult> GetAllTasksQueryHandler()
         {
             IEnumerable<TaskVm> vm = new List<TaskVm>();
@@ -46,7 +53,8 @@ namespace Services
             if (tasks != null && tasks.Any())
                 vm = _mapper.Map<IEnumerable<TaskVm>>(tasks);
 
-            return new GetAllTasksQueryResult() { 
+            return new GetAllTasksQueryResult()
+            {
                 Payload = vm
             };
         }
