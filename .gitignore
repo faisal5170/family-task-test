@@ -7,3 +7,6 @@ riderModule.iml
 .vs
 /Sql/Sql.dbmdl
 /Sql/Sql.jfm
+*.TMP
+WebClient/wwwroot/debug.log
+DataLayer/DataLayer.csproj.user

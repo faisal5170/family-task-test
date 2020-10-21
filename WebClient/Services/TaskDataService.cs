@@ -1,51 +1,83 @@
-﻿using System;
+﻿using Domain.Commands;
+using Domain.Queries;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 using WebClient.Abstractions;
-using WebClient.Shared.Models;
+using Microsoft.AspNetCore.Components;
+using Domain.ViewModel;
+using Core.Extensions.ModelConversion;
 
 namespace WebClient.Services
 {
     public class TaskDataService: ITaskDataService
-    {
-        public TaskDataService()
+    {    
+
+        private readonly HttpClient httpClient;
+        public TaskDataService(IHttpClientFactory clientFactory)
         {
-            Tasks = new List<TaskModel>();
+            httpClient = clientFactory.CreateClient("FamilyTaskAPI");
+            tasks = new List<TaskVm>();
+            LoadTasks();
         }
+        private IEnumerable<TaskVm> tasks;
 
+        public IEnumerable<TaskVm> Tasks => tasks;
 
+        public TaskVm SelectedTask { get; private set; }
 
-
-        public List<TaskModel> Tasks { get; private set; }
-        public TaskModel SelectedTask { get; private set; }
-
-
+        public event EventHandler TasksChanged;
+        public event EventHandler SelectedTaskChanged;
+        public event EventHandler<string> CreateTaskFailed;
         public event EventHandler TasksUpdated;
         public event EventHandler TaskSelected;
 
-        public void SelectTask(Guid id)
+        private async void LoadTasks()
         {
-            SelectedTask = Tasks.SingleOrDefault(t => t.Id == id);
-            TasksUpdated?.Invoke(this, null);
+            tasks = (await GetAllTasks()).Payload;
+            TasksChanged?.Invoke(this, null);
         }
 
-        public void ToggleTask(Guid id)
+        private async Task<CreateTaskCommandResult> Create(CreateTaskCommand command)
         {
-            foreach (var taskModel in Tasks)
+            return await httpClient.PostJsonAsync<CreateTaskCommandResult>("tasks", command);
+        }
+
+        private async Task<GetAllTasksQueryResult> GetAllTasks()
+        {
+            return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
+        }
+
+        public async Task CreateTask(TaskVm model)
+        {
+            var result = await Create(model.ToCreateTaskCommand());
+            if (result != null)
             {
-                if (taskModel.Id == id)
+                var updatedList = (await GetAllTasks()).Payload;
+
+                if (updatedList != null)
                 {
-                    taskModel.IsDone = !taskModel.IsDone;
+                    tasks = updatedList;
+                    TasksChanged?.Invoke(this, null);
+                    return;
                 }
+                CreateTaskFailed?.Invoke(this, "The creation was successful, but we can no longer get an updated list of tasks from the server.");
             }
 
-            TasksUpdated?.Invoke(this, null);
+            CreateTaskFailed?.Invoke(this, "Unable to create record.");
         }
 
-        public void AddTask(TaskModel model)
+        public void SelectTask(Guid id)
         {
-            Tasks.Add(model);
-            TasksUpdated?.Invoke(this, null);
+            if (tasks.All(taskVm => taskVm.Id != id)) return;
+            {
+                SelectedTask = tasks.SingleOrDefault(taskVm => taskVm.Id == id);
+                SelectedTaskChanged?.Invoke(this, null);
+            }
         }
     }
 }

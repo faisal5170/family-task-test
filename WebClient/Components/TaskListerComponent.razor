@@ -64,7 +64,7 @@
 </div>
 
 @code  {
-    private List<TaskModel> tasks = new List<TaskModel>();
+    private List<TaskVm> tasks = new List<TaskVm>();
     private MemberVm selectedMember;
 
     protected override Task OnInitializedAsync()
@@ -75,9 +75,9 @@
         return base.OnInitializedAsync();
     }
 
-    private void ToggleTask(TaskModel model)
+    private void ToggleTask(TaskVm model)
     {
-        taskService.ToggleTask(model.Id);
+       // taskService.ToggleTask(model.Id);
         StateHasChanged();
     }
 
@@ -97,7 +97,7 @@
 
         if (selectedMember == null || selectedMember.Id == Guid.Empty)
         {
-            tasks = taskService.Tasks;
+            tasks = taskService.Tasks.ToList();
             StateHasChanged();
             return;
         };
