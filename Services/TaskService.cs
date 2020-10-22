@@ -16,12 +16,14 @@ namespace Services
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
+        private readonly IMemberRepository _memberRepository;
         private readonly IMapper _mapper;
 
-        public TaskService(IMapper mapper, ITaskRepository taskRepository)
+        public TaskService(IMapper mapper, ITaskRepository taskRepository, IMemberRepository memberRepository)
         {
             _mapper = mapper;
             _taskRepository = taskRepository;
+            _memberRepository = memberRepository;
         }
 
         public async Task<CreateTaskCommandResult> CreateTaskCommandHandler(CreateTaskCommand command)
@@ -29,9 +31,14 @@ namespace Services
             try
             {
                 var task = _mapper.Map<Domain.DataModels.Task>(command);
-                var persistedMember = await _taskRepository.CreateRecordAsync(task);
+                var persistedTask = await _taskRepository.CreateRecordAsync(task);
 
-                var vm = _mapper.Map<TaskVm>(persistedMember);
+                var vm = _mapper.Map<TaskVm>(persistedTask);
+                if (persistedTask.AssignedToId != null || persistedTask.AssignedToId != Guid.Empty)
+                {
+                    vm.Member = await _memberRepository.ByIdAsync(persistedTask.AssignedToId.Value);
+                    vm.Member.Tasks = null;
+                }
                 return new CreateTaskCommandResult()
                 {
                     Payload = vm

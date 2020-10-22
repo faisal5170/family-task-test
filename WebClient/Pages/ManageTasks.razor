@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="col-10 offset-1">
-                    <TaskListerComponent Tasks="@filteredTasks" UpdateCallback="@UpdateTask" />
+                    <TaskListerComponent Tasks="@tasks" UpdateCallback="@UpdateTask" />
                 </div>
             }
             @if (false)
@@ -105,7 +105,7 @@
                 }
             });
         }
-        filteredTasks = tasks;
+        //filteredTasks = tasks;
         StateHasChanged();
     }
 
