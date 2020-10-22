@@ -55,23 +55,10 @@ namespace WebClient.Services
             return await _httpClient.PutJsonAsync<UpdateTaskCommandResult>("tasks/" + command.Id, command);
         }
 
-        public async Task CreateTask(TaskVm model)
+        public async Task<CreateTaskCommandResult> CreateTask(TaskVm model)
         {
             var result = await Create(model.ToCreateTaskCommand());
-            if (result != null)
-            {
-                var updatedList = (await GetAllTasks()).Payload;
-
-                if (updatedList != null)
-                {
-                    tasks = updatedList;
-                    TasksChanged?.Invoke(this, null);
-                    return;
-                }
-                CreateTaskFailed?.Invoke(this, "The creation was successful, but we can no longer get an updated list of tasks from the server.");
-            }
-
-            CreateTaskFailed?.Invoke(this, "Unable to create record.");
+            return result;
         }
     }
 }

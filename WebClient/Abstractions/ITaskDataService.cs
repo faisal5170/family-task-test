@@ -13,7 +13,7 @@ namespace WebClient.Abstractions
         IEnumerable<TaskVm> Tasks { get; }
         TaskVm SelectedTask { get; }
 
-        Task CreateTask(TaskVm model);
+        Task<CreateTaskCommandResult> CreateTask(TaskVm model);
 
         public Task<GetAllTasksQueryResult> GetAllTasks();
         public Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command);

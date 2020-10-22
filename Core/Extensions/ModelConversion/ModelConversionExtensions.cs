@@ -24,7 +24,7 @@ namespace Core.Extensions.ModelConversion
             return command;
         }
 
-        public static MenuItem[] ToMenuItems(this IEnumerable<MemberVm> models)
+        public static List<MenuItem> ToMenuItems(this IEnumerable<MemberVm> models)
         {
             return models.Select(m => new MenuItem()
             {
@@ -32,7 +32,7 @@ namespace Core.Extensions.ModelConversion
                 isActive = false,
                 label = $"{m.LastName}, {m.FirstName}",
                 referenceId = m.Id
-            }).ToArray();
+            }).ToList();
         }
 
         public static UpdateMemberCommand ToUpdateMemberCommand(this MemberVm model)

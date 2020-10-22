@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="col-10 offset-1">
-                    <TaskListerComponent />
+                    <TaskListerComponent Tasks="@filteredTasks" UpdateCallback="@UpdateTask" />
                 </div>
             }
             @if (false)
@@ -43,31 +43,82 @@
 
     private TaskVm task;
     public List<TaskModel> tasks;
+    public List<TaskModel> filteredTasks;
     public string newTask;
 
 
     private bool isLoaded;
     private bool showLister;
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         showLister = true;
         isLoaded = true;
         task = new TaskVm();
         tasks = new List<TaskModel>();
+        filteredTasks = new List<TaskModel>();
         await LoadCurrentTasks();
-        return base.OnInitializedAsync();
     }
 
 
-    private void OnAddItem()
+    private async void OnAddItem()
     {
         if (memberService?.SelectedMember != null)
         {
             task.AssignedToId = memberService.SelectedMember.Id;
         }
-        taskDataService.CreateTask(task);
+        var addedTaskResult = await taskDataService.CreateTask(task);
+        if (addedTaskResult != null && addedTaskResult.Payload != null)
+        {
+            var taskVm = addedTaskResult.Payload;
+            var taskModel = new TaskModel();
+
+            taskModel.id = taskVm.Id;
+            taskModel.isDone = taskVm.IsComplete;
+            if (taskVm.Member != null)
+            {
+                var memberInfo = taskVm.Member;
+                taskModel.member = new FamilyMember() { id = memberInfo.Id, firstname = memberInfo.FirstName, lastname = memberInfo.LastName, avtar = memberInfo.Avatar };
+            }
+            taskModel.text = task.Subject;
+            this.tasks.Add(taskModel);
+            this.filteredTasks.Add(taskModel);
+            task.Subject = string.Empty;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadCurrentTasks()
+    {
+        var taskResults = await taskDataService.GetAllTasks();
+        foreach (var taskItem in taskResults.Payload)
+        {
+            tasks.Add(new TaskModel()
+            {
+                id = taskItem.Id,
+                text = taskItem.Subject,
+                isDone = taskItem.IsComplete,
+                member = taskItem.Member == null ? null : new FamilyMember()
+                {
+                    avtar = taskItem.Member.Avatar,
+                    id = taskItem.Member.Id
+                }
+            });
+        }
+        filteredTasks = tasks;
         StateHasChanged();
     }
 
+    private async void UpdateTask(TaskModel task)
+    {
+        var updateTaskCommand = new Domain.Commands.UpdateTaskCommand()
+        {
+            IsComplete = task.isDone,
+            Subject = task.text,
+            Id = task.id,
+            AssignedToId = task.member?.id
+        };
+        var result = await taskDataService.Update(updateTaskCommand);
+        StateHasChanged();
+    }
 }

@@ -53,7 +53,7 @@
 
 <div class="task-wrapper">
 
-    @foreach (var item in tasks)
+    @foreach (var item in Tasks)
     {
         <div class="task-item p-3 my-3 row m-0">
             <div class="col-10 p-0">
@@ -74,68 +74,14 @@
 
 @code  {
 
-    private MemberVm selectedMember;
-    [Parameter] public List<TaskModel> tasks { get; set; }
+    [Parameter] public List<TaskModel> Tasks { get; set; }
+    [Parameter] public EventCallback<TaskModel> UpdateCallback { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private async void ToggleTask(TaskModel item, Boolean val)
     {
-        tasks = new List<TaskModel>();
-        await LoadCurrentTasks();
-       // taskService.TasksChanged += TaskServiceOnTasksUpdated;
-        //taskService.SelectedTaskChanged += TaskServiceOnSelectedMemberChanged;
-        //  return base.OnInitializedAsync();
+        item.isDone = val;
+        await UpdateCallback.InvokeAsync(item);
     }
 
-    private async Task ToggleTask(TaskModel task, Boolean val)
-    {
-        var updateTaskCommand = new Domain.Commands.UpdateTaskCommand()
-        {
-            IsComplete = val,
-            Subject = task.text,
-            Id = task.id,
-            AssignedToId = task.member.id
-        };
-        var result = await taskService.Update(updateTaskCommand);
-        StateHasChanged();
-    }
-
-    private async Task TaskServiceOnTasksUpdated(object sender, EventArgs e)
-    {
-        await LoadCurrentTasks();
-    }
-
-    private void TaskServiceOnSelectedMemberChanged(object sender, EventArgs e)
-    {
-        LoadCurrentTasks();
-    }
-
-    private async Task LoadCurrentTasks()
-    {
-        selectedMember = memberService.SelectedMember;
-
-        if (selectedMember == null || selectedMember.Id == Guid.Empty)
-        {
-            var taskResults = await taskService.GetAllTasks();
-            foreach (var taskItem in taskResults.Payload)
-            {
-                tasks.Add(new TaskModel()
-                {
-                    id = taskItem.Id,
-                    text = taskItem.Subject,
-                    isDone = taskItem.IsComplete,
-                    member = taskItem.Member == null ? null : new FamilyMember()
-                    {
-                        avtar = taskItem.Member.Avatar,
-                        id = taskItem.Member.Id
-                    }
-                });
-            }
-            StateHasChanged();
-            return;
-        };
-
-        //tasks = taskService.Tasks.Where(t => t.AssignedToId == selectedMember.Id).ToList();
-        StateHasChanged();
-    }
 
 }
