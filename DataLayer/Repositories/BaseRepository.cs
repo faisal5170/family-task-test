@@ -65,9 +65,9 @@ namespace DataLayer
 
         public virtual async Task<int> UpdateRecordAsync(TEntity record, CancellationToken cancellationToken = default)
         {
-            var result = Context.Attach(record);
-            result.State = EntityState.Modified;
-            return await Context.SaveChangesAsync(cancellationToken);
+                var result = Context.Attach(record);
+                result.State = EntityState.Modified;
+                return await Context.SaveChangesAsync(cancellationToken);
         }
 
         public virtual async Task<int> DeleteRecordAsync(TIdentity id, CancellationToken cancellationToken = default)

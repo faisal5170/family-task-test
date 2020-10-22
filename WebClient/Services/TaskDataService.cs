@@ -17,12 +17,12 @@ namespace WebClient.Services
     public class TaskDataService : ITaskDataService
     {
 
-        private readonly HttpClient httpClient;
+        private readonly HttpClient _httpClient;
         public TaskDataService(IHttpClientFactory clientFactory)
         {
-            httpClient = clientFactory.CreateClient("FamilyTaskAPI");
+            _httpClient = clientFactory.CreateClient("FamilyTaskAPI");
             tasks = new List<TaskVm>();
-            // LoadTasks();
+            LoadTasks();
         }
         private IEnumerable<TaskVm> tasks;
 
@@ -33,8 +33,6 @@ namespace WebClient.Services
         public event EventHandler TasksChanged;
         public event EventHandler SelectedTaskChanged;
         public event EventHandler<string> CreateTaskFailed;
-        public event EventHandler TasksUpdated;
-        public event EventHandler TaskSelected;
 
         private async void LoadTasks()
         {
@@ -42,14 +40,19 @@ namespace WebClient.Services
             TasksChanged?.Invoke(this, null);
         }
 
-        private async Task<CreateTaskCommandResult> Create(CreateTaskCommand command)
+        public async Task<CreateTaskCommandResult> Create(CreateTaskCommand command)
         {
-            return await httpClient.PostJsonAsync<CreateTaskCommandResult>("tasks", command);
+            return await _httpClient.PostJsonAsync<CreateTaskCommandResult>("tasks", command);
         }
 
-        private async Task<GetAllTasksQueryResult> GetAllTasks()
+        public async Task<GetAllTasksQueryResult> GetAllTasks()
         {
-            return await httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
+            return await _httpClient.GetJsonAsync<GetAllTasksQueryResult>("tasks");
+        }
+
+        public async Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command)
+        {
+            return await _httpClient.PutJsonAsync<UpdateTaskCommandResult>("tasks/" + command.Id, command);
         }
 
         public async Task CreateTask(TaskVm model)
@@ -69,15 +72,6 @@ namespace WebClient.Services
             }
 
             CreateTaskFailed?.Invoke(this, "Unable to create record.");
-        }
-
-        public void SelectTask(Guid id)
-        {
-            if (tasks.All(taskVm => taskVm.Id != id)) return;
-            {
-                SelectedTask = tasks.SingleOrDefault(taskVm => taskVm.Id == id);
-                SelectedTaskChanged?.Invoke(this, null);
-            }
         }
     }
 }

@@ -53,22 +53,11 @@ namespace Core.Extensions.ModelConversion
         {
             var command = new CreateTaskCommand()
             {
-                AssignedToId = model.AssignedToId,
+                AssignedToId = Guid.Empty == model.AssignedToId ? (Guid?)null : model.AssignedToId,
                 IsComplete = model.IsComplete,
                 Subject = model.Subject
             };
             return command;
         }
-        public static TaskItem[] ToTaskItems(this IEnumerable<TaskVm> models)
-        {
-            return models.Select(m => new TaskItem()
-            {
-                referenceId = m.Id,
-                isComplete = m.IsComplete,
-                memberId = m.AssignedToId,
-                taskName = m.Subject
-            }).ToArray();
-        }
-
     }
 }

@@ -48,14 +48,33 @@ namespace Services
         {
             IEnumerable<TaskVm> vm = new List<TaskVm>();
 
-            var tasks = await _taskRepository.Reset().ToListAsync();
+            var tasks = await _taskRepository.GetAllTasks();
 
             if (tasks != null && tasks.Any())
+            {
+                tasks.Where(task => task.Member != null).ToList().ForEach(memberTask => memberTask.Member.Tasks = null);
                 vm = _mapper.Map<IEnumerable<TaskVm>>(tasks);
+            }
 
             return new GetAllTasksQueryResult()
             {
                 Payload = vm
+            };
+        }
+
+        public async Task<UpdateTaskCommandResult> UpdateTaskCommandHandler(UpdateTaskCommand command)
+        {
+            var isSucceed = true;
+            var task = await _taskRepository.NoTrack().GetTask(command.Id);
+            _mapper.Map(command, task);
+
+            var affectedRecordsCount = await _taskRepository.UpdateRecordAsync(task);
+            if (affectedRecordsCount < 1)
+                isSucceed = false;
+
+            return new UpdateTaskCommandResult()
+            {
+                Succeed = isSucceed
             };
         }
 

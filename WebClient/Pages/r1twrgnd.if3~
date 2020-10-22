@@ -42,7 +42,7 @@
 @code {
 
     private TaskVm task;
-    public List<TaskModel> tasks;
+    public List<TaskVm> tasks;
     public string newTask;
 
 
@@ -54,8 +54,6 @@
         showLister = true;
         isLoaded = true;
         task = new TaskVm();
-        tasks = new List<TaskModel>();
-        await LoadCurrentTasks();
         return base.OnInitializedAsync();
     }
 

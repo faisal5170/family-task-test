@@ -13,12 +13,9 @@ namespace WebClient.Abstractions
         IEnumerable<TaskVm> Tasks { get; }
         TaskVm SelectedTask { get; }
 
-        event EventHandler TasksUpdated;
-        event EventHandler TaskSelected;
-        event EventHandler TasksChanged;
-        event EventHandler SelectedTaskChanged;
-        event EventHandler<string> CreateTaskFailed;
-
         Task CreateTask(TaskVm model);
+
+        public Task<GetAllTasksQueryResult> GetAllTasks();
+        public Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command);
     }
 }

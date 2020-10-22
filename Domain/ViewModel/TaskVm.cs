@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.DataModels;
+using System;
 
 namespace Domain.ViewModel
 {
@@ -8,5 +9,6 @@ namespace Domain.ViewModel
         public Guid AssignedToId { get; set; }
         public string Subject { get; set; }
         public bool IsComplete { get; set; }
+        public Member Member { get; set; }
     }
 }

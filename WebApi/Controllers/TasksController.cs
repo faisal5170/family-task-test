@@ -44,5 +44,25 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(UpdateTaskCommand), StatusCodes.Status200OK)]
+        public async Task<IActionResult> Update(Guid id, UpdateTaskCommand command)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var result = await _taskService.UpdateTaskCommandHandler(command);
+                return Ok(result);
+            }
+            catch (NotFoundException<Guid>)
+            {
+                return NotFound();
+            }
+        }
     }
 }

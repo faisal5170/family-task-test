@@ -10,6 +10,7 @@ namespace WebApi.AutoMapper
         public TaskProfile()
         {
             CreateMap<CreateTaskCommand, Task>();
+            CreateMap<UpdateTaskCommand, Task>();
             CreateMap<Task, TaskVm>();
         }
     }

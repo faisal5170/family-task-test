@@ -33,36 +33,36 @@ namespace WebClient.Pages
 
         private void MemberDataService_MembersChanged(object sender, EventArgs e)
         {
-            UpdateMembers();
-            ReloadMenu();
+            //UpdateMembers();
+            //ReloadMenu();
 
-            showCreator = true;
-            isLoaded = true;
+            //showCreator = true;
+            //isLoaded = true;
 
-            StateHasChanged();
+            //StateHasChanged();
         }
 
         void UpdateMembers()
         {
-            var result = MemberDataService.Members;
+            //var result = MemberDataService.Members;
 
-            if (result.Any())
-            {
-                members = result.ToList();
-            }
+            //if (result.Any())
+            //{
+            //    members = result.ToList();
+            //}
         }
 
         void ReloadMenu()
         {
-            for (int i = 0; i < members.Count; i++)
-            {
-                leftMenuItem.Add(new MenuItem
-                {
-                    iconColor = members[i].Avatar,
-                    label = members[i].FirstName,
-                    referenceId = members[i].Id
-                });
-            }
+            //for (int i = 0; i < members.Count; i++)
+            //{
+            //    leftMenuItem.Add(new MenuItem
+            //    {
+            //        iconColor = members[i].Avatar,
+            //        label = members[i].FirstName,
+            //        referenceId = members[i].Id
+            //    });
+            //}
         }
        
         protected void onAddItem()

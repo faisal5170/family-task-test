@@ -8,7 +8,7 @@ namespace DataLayer
     public class FamilyTaskContext : DbContext
     {
 
-        public FamilyTaskContext(DbContextOptions<FamilyTaskContext> options):base(options)
+        public FamilyTaskContext(DbContextOptions<FamilyTaskContext> options) : base(options)
         {
 
         }
@@ -20,13 +20,17 @@ namespace DataLayer
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Member>(entity => {
+            modelBuilder.Entity<Member>(entity =>
+            {
                 entity.HasKey(k => k.Id);
                 entity.ToTable("Member");
             });
 
-            modelBuilder.Entity<Task>(entity => {
+            modelBuilder.Entity<Task>(entity =>
+            {
                 entity.HasKey(k => k.Id);
+                //entity.HasOne(c => c.Member);
+                //entity.HasKey(c => c.AssignedToId);
                 entity.ToTable("Task");
             });
         }

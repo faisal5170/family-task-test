@@ -52,50 +52,56 @@
 </style>
 
 <div class="task-wrapper">
-    @if (tasks != null && tasks.Length > 0)
+
+    @foreach (var item in tasks)
     {
-        @*@foreach (var item in tasks)
-        {
-            <div class="task-item p-3 my-3 row m-0">
-                <div class="col-10 p-0">
-                    <Check TValue="bool" Checked="@item.isComplete" CheckedChanged="@(val => ToggleTask(item))">
-                        <span class="@(item.isComplete ? "done-text" : "")">@item.taskName</span>
-                    </Check>
-                </div>
-                <div class="col-2 p-0 d-flex justify-content-end align-items-center">
-                    @if (item.memberId != null)
-                    {
-                        <div class="avtar mr-1" style="background-color: @selectedMember.Avatar;"></div>
-                    }
-                    <img class="delete-icon" src="/assets/images/delete-icon.svg" />
-                </div>
+        <div class="task-item p-3 my-3 row m-0">
+            <div class="col-10 p-0">
+                <Check TValue="bool" Checked="@item.isDone" CheckedChanged="@(val => ToggleTask(item,val))">
+                    <span class="@(item.isDone ? "done-text" : "")">@item.text</span>
+                </Check>
             </div>
-        }*@
+            <div class="col-2 p-0 d-flex justify-content-end align-items-center">
+                @if (item.member != null)
+                {
+                    <div class="avtar mr-1" style="background-color: @item.member.avtar;"></div>
+                }
+                <img class="delete-icon" src="/assets/images/delete-icon.svg" />
+            </div>
+        </div>
     }
-    </div>
+</div>
 
 @code  {
 
     private MemberVm selectedMember;
-    [Parameter] public TaskItem[] tasks { get; set; }
+    [Parameter] public List<TaskModel> tasks { get; set; }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-       // LoadCurrentTasks();
+        tasks = new List<TaskModel>();
+        await LoadCurrentTasks();
        // taskService.TasksChanged += TaskServiceOnTasksUpdated;
         //taskService.SelectedTaskChanged += TaskServiceOnSelectedMemberChanged;
-        return base.OnInitializedAsync();
+        //  return base.OnInitializedAsync();
     }
 
-    private void ToggleTask(TaskItem model)
+    private async Task ToggleTask(TaskModel task, Boolean val)
     {
-        // taskService.ToggleTask(model.Id);
+        var updateTaskCommand = new Domain.Commands.UpdateTaskCommand()
+        {
+            IsComplete = val,
+            Subject = task.text,
+            Id = task.id,
+            AssignedToId = task.member.id
+        };
+        var result = await taskService.Update(updateTaskCommand);
         StateHasChanged();
     }
 
-    private void TaskServiceOnTasksUpdated(object sender, EventArgs e)
+    private async Task TaskServiceOnTasksUpdated(object sender, EventArgs e)
     {
-        LoadCurrentTasks();
+        await LoadCurrentTasks();
     }
 
     private void TaskServiceOnSelectedMemberChanged(object sender, EventArgs e)
@@ -103,19 +109,33 @@
         LoadCurrentTasks();
     }
 
-    private void LoadCurrentTasks()
+    private async Task LoadCurrentTasks()
     {
-        // selectedMember = memberService.SelectedMember;
+        selectedMember = memberService.SelectedMember;
 
-        //  if (selectedMember == null || selectedMember.Id == Guid.Empty)
-        //   {
-        tasks = taskService.Tasks.ToTaskItems();
+        if (selectedMember == null || selectedMember.Id == Guid.Empty)
+        {
+            var taskResults = await taskService.GetAllTasks();
+            foreach (var taskItem in taskResults.Payload)
+            {
+                tasks.Add(new TaskModel()
+                {
+                    id = taskItem.Id,
+                    text = taskItem.Subject,
+                    isDone = taskItem.IsComplete,
+                    member = taskItem.Member == null ? null : new FamilyMember()
+                    {
+                        avtar = taskItem.Member.Avatar,
+                        id = taskItem.Member.Id
+                    }
+                });
+            }
+            StateHasChanged();
+            return;
+        };
+
+        //tasks = taskService.Tasks.Where(t => t.AssignedToId == selectedMember.Id).ToList();
         StateHasChanged();
-        return;
-        //  };
-
-        // tasks = taskService.Tasks.Where(t => t.AssignedToId == selectedMember.Id).ToList();
-        //  StateHasChanged();
     }
 
 }
