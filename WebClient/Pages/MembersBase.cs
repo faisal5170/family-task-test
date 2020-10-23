@@ -13,7 +13,6 @@ namespace WebClient.Pages
     public class MembersBase: ComponentBase
     {       
         protected List<MemberVm> members = new List<MemberVm>();
-        protected List<MenuItem> leftMenuItem = new List<MenuItem>();
 
         protected bool showCreator;
         protected bool isLoaded;

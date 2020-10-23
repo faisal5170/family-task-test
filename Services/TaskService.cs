@@ -85,5 +85,22 @@ namespace Services
             };
         }
 
+        public async Task<AssignTaskCommandResult> AssignTaskToMember(Guid taskId, Guid memberId)
+        {
+            var isSucceed = true;
+            var task = await _taskRepository.ByIdAsync(taskId);
+            task.AssignedToId = memberId;
+
+            var affectedRecordsCount = await _taskRepository.UpdateRecordAsync(task);
+
+            if (affectedRecordsCount < 1)
+                isSucceed = false;
+
+            return new AssignTaskCommandResult()
+            {
+                Succeed = isSucceed
+            };
+        }
+
     }
 }

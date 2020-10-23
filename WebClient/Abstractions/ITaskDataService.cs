@@ -17,5 +17,6 @@ namespace WebClient.Abstractions
 
         public Task<GetAllTasksQueryResult> GetAllTasks();
         public Task<UpdateTaskCommandResult> Update(UpdateTaskCommand command);
+        Task AssignTaskToMember(string taskId, string memberId);
     }
 }

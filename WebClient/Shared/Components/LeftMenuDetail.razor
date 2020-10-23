@@ -1,0 +1,61 @@
+@using Microsoft.JSInterop
+@using Domain.ViewModel
+@using Domain.ClientSideModels
+@inject IJSRuntime JSRuntime
+
+    @*<div class="menu-item col-10 offset-1 p-3 my-4 p-sm-2 @(item.isActive ? "active" : "")" @onclick="@(e => SelectMember(item.referenceId))">
+        @if (item.iconColor != null)
+        {
+            <div class="avtar mr-3" style="background-color: @(item.iconColor);"> </div>
+        }
+        <div class="label"> @item.label </div>
+    </div>*@
+
+
+<div id="@Menu.referenceId" class="@(Menu.referenceId == Guid.Empty ? "" : "drop-menu") menu-item col-10 offset-1 p-3 my-4 p-sm-2 @(Menu.isActive ? "active" : "")" @onclick="@(e => Menu.InvokClickCallback(Menu))">
+    @if (Menu.iconColor != null)
+    {
+<div class="avtar mr-3" style="background-color: @(Menu.iconColor);"> </div>}
+    <div class="label"> @Menu.label </div>
+
+    @if (Menu.referenceId != Guid.Empty)
+    {
+
+<div id="dropZone@(Menu.referenceId)" style="display:none"
+     class="menu-item col-6 offset-1 p-3 my-4 p-sm-2">Drop task</div>}
+
+
+</div>
+
+
+@code { [Parameter] public MenuItem Menu { get; set; }
+    [Parameter] public EventCallback<TaskVm> TaskDropCallback { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+
+            if (Menu.referenceId != Guid.Empty)
+            {
+                var dotNetInstance = DotNetObjectReference.Create(this);
+
+
+                await JSRuntime.InvokeVoidAsync("DropTask", Menu.referenceId.ToString(), dotNetInstance);
+            }
+        }
+    }
+
+    [JSInvokable]
+    public async Task AssignTaskToMember(string taskId, string memberId)
+    {
+
+        await TaskDropCallback.InvokeAsync(new TaskVm
+        {
+            AssignedToId = Guid.Parse(memberId),
+            Id = Guid.Parse(taskId)
+        });
+
+
+    }
+}

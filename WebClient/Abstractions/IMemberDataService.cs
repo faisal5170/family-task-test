@@ -23,6 +23,6 @@ namespace WebClient.Abstractions
         Task CreateMember(MemberVm model);
         void SelectMember(Guid id);
         void SelectNullMember();
-
+        Task<FamilyMember[]> GetAllMembersList();
     }
 }

@@ -64,5 +64,13 @@ namespace WebApi.Controllers
                 return NotFound();
             }
         }
+
+        [HttpPost("{id}/assign/{memberId}")]
+        [ProducesResponseType(typeof(AssignTaskCommandResult), StatusCodes.Status200OK)]
+        public async Task<IActionResult> AssignTaskToMember(Guid id, Guid memberId)
+        {
+            var result = await _taskService.AssignTaskToMember(id, memberId);
+            return Ok(result);
+        }
     }
 }

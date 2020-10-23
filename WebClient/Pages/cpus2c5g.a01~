@@ -31,7 +31,7 @@
                     <TaskListerComponent Tasks="@filteredTasks" UpdateCallback="@UpdateTask" />
                 </div>
             }
-            @if (showCreator)
+            @if (false)
             {
                 <div class="col-10 offset-1 pt-5">
                     <FamilyMemberCreator />
@@ -61,10 +61,9 @@
         task = new TaskVm();
         tasks = new List<TaskModel>();
         filteredTasks = new List<TaskModel>();
-        members = await memberService.GetAllMembersList();
+        members = await memberService.GetAllMembers1();
         await LoadCurrentTasks();
         SetLeftMenuItems(members);
-        isLoaded = true;
     }
 
     private async Task OnAddItem()
@@ -110,6 +109,7 @@
                 }
             });
         }
+        //filteredTasks = tasks;
         StateHasChanged();
     }
 
@@ -123,7 +123,7 @@
             referenceId = Guid.Empty,
             isActive = true
         };
-        MenuItems[0].ClickCallback += ShowAllTasks;
+        MenuItems[0].ClickCallback += showAllTasks;
         for (int i = 1; i < members.Length + 1; i++)
         {
             MenuItems[i] = new MenuItem
@@ -133,19 +133,19 @@
                 referenceId = members[i - 1].id,
                 isActive = false
             };
-            MenuItems[i].ClickCallback += OnItemClick;
+            MenuItems[i].ClickCallback += onItemClick;
         }
     }
-    private void ShowAllTasks(object sender, object e)
+    private void showAllTasks(object sender, object e)
     {
         filteredTasks = tasks;
         showLister = true;
         showCreator = false;
         newTask.AssignedMemberId = string.Empty;
-        MakeMenuItemActive(e);
+        makeMenuItemActive(e);
         StateHasChanged();
     }
-    private void MakeMenuItemActive(object e)
+    private void makeMenuItemActive(object e)
     {
         foreach (var item in MenuItems)
         {
@@ -156,10 +156,10 @@
             e.GetType().GetProperty("isActive").SetValue(e, true);
         }
     }
-    private void OnItemClick(object sender, object e)
+    private void onItemClick(object sender, object e)
     {
         Guid val = (Guid)e.GetType().GetProperty("referenceId").GetValue(e);
-        MakeMenuItemActive(e);
+        makeMenuItemActive(e);
         if (tasks != null && tasks.Count > 0)
         {
             filteredTasks = tasks.Where(item =>

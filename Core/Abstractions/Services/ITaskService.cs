@@ -13,5 +13,6 @@ namespace Core.Abstractions.Services
         Task<CreateTaskCommandResult> CreateTaskCommandHandler(CreateTaskCommand command);
         Task<GetAllTasksQueryResult> GetAllTasksQueryHandler();
         Task<UpdateTaskCommandResult> UpdateTaskCommandHandler(UpdateTaskCommand command);
+        Task<AssignTaskCommandResult> AssignTaskToMember(Guid taskId, Guid memberId);
     }
 }

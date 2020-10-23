@@ -60,5 +60,10 @@ namespace WebClient.Services
             var result = await Create(model.ToCreateTaskCommand());
             return result;
         }
+
+        public async Task AssignTaskToMember(string taskId, string memberId)
+        {
+            var result = await _httpClient.PostJsonAsync<AssignTaskCommandResult>($"tasks/{taskId}/assign/{memberId}", null);
+        }
     }
 }

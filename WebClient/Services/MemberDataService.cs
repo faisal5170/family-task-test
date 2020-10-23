@@ -11,6 +11,7 @@ using WebClient.Abstractions;
 using Microsoft.AspNetCore.Components;
 using Domain.ViewModel;
 using Core.Extensions.ModelConversion;
+using WebClient.Exentions;
 
 namespace WebClient.Services
 {
@@ -109,6 +110,12 @@ namespace WebClient.Services
         {
             SelectedMember = null;
             SelectedMemberChanged?.Invoke(this, null);
+        }
+
+        public async Task<FamilyMember[]> GetAllMembersList()
+        {
+            var members = await httpClient.GetJsonAsync<GetAllMembersQueryResult>("members");
+            return members.Payload.Select(u => u.ToFamilyMember()).ToArray();
         }
     }
 }
