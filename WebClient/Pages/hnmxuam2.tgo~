@@ -76,10 +76,6 @@
         {
             task.AssignedToId = selectedMemberId;
         }
-        else
-        {
-            task.AssignedToId = Guid.Empty;
-        }
         var addedTaskResult = await taskDataService.CreateTask(task);
         if (addedTaskResult != null && addedTaskResult.Payload != null)
         {
@@ -94,11 +90,8 @@
             }
             taskModel.text = task.Subject;
             tasks.Add(taskModel);
-            if (taskVm.Member != null)
-            {
-                var activeMenu = MenuItems.First(x => x.referenceId == taskModel.member.id);
-                OnItemClick(null, activeMenu);
-            }
+            var activeMenu = MenuItems.First(x => x.referenceId == taskModel.member.id);
+            OnItemClick(null, activeMenu);
             task.Subject = string.Empty;
             StateHasChanged();
         }
