@@ -19,10 +19,11 @@ namespace WebClient.Abstractions
         event EventHandler<string> CreateMemberFailed;
 
 
-        Task UpdateMember(MemberVm model);
-        Task CreateMember(MemberVm model);
+        Task<CreateMemberCommandResult> Create(CreateMemberCommand command);
+        Task<UpdateMemberCommandResult> Update(UpdateMemberCommand command);
         void SelectMember(Guid id);
         void SelectNullMember();
+        Task<GetAllMembersQueryResult> GetAllMembers();
         Task<FamilyMember[]> GetAllMembersList();
     }
 }

@@ -17,10 +17,10 @@ namespace WebClient.Services
 {
     public class MemberDataService : IMemberDataService
     {
-        private readonly HttpClient httpClient;
+        private readonly HttpClient _httpClient;
         public MemberDataService(IHttpClientFactory clientFactory)
         {
-            httpClient = clientFactory.CreateClient("FamilyTaskAPI");
+            _httpClient = clientFactory.CreateClient("FamilyTaskAPI");
             members = new List<MemberVm>();
             LoadMembers();
         }
@@ -41,60 +41,19 @@ namespace WebClient.Services
             MembersChanged?.Invoke(this, null);
         }
 
-        private async Task<CreateMemberCommandResult> Create(CreateMemberCommand command)
-        {            
-            return await httpClient.PostJsonAsync<CreateMemberCommandResult>("members", command);
+        public async Task<CreateMemberCommandResult> Create(CreateMemberCommand command)
+        {
+            return await _httpClient.PostJsonAsync<CreateMemberCommandResult>("members", command);
         }
 
-        private async Task<GetAllMembersQueryResult> GetAllMembers()
+        public async Task<GetAllMembersQueryResult> GetAllMembers()
         {
-            return await httpClient.GetJsonAsync<GetAllMembersQueryResult>("members");
+            return await _httpClient.GetJsonAsync<GetAllMembersQueryResult>("members");
         }
 
-        private async Task<UpdateMemberCommandResult> Update(UpdateMemberCommand command)
+        public async Task<UpdateMemberCommandResult> Update(UpdateMemberCommand command)
         {
-            return await httpClient.PutJsonAsync<UpdateMemberCommandResult>($"members/{command.Id}", command);
-        }
-
-        public async Task UpdateMember(MemberVm model)
-        {
-            var result = await Update(model.ToUpdateMemberCommand());
-
-            Console.WriteLine(JsonSerializer.Serialize(result));
-
-            if(result != null)
-            {
-                var updatedList = (await GetAllMembers()).Payload;
-
-                if(updatedList != null)
-                {
-                    members = updatedList;
-                    MembersChanged?.Invoke(this, null);
-                    return;
-                }
-                UpdateMemberFailed?.Invoke(this, "The save was successful, but we can no longer get an updated list of members from the server.");
-            }
-
-            UpdateMemberFailed?.Invoke(this, "Unable to save changes.");
-        }
-
-        public async Task CreateMember(MemberVm model)
-        {
-            var result = await Create(model.ToCreateMemberCommand());
-            if (result != null)
-            {
-                var updatedList = (await GetAllMembers()).Payload;
-
-                if (updatedList != null)
-                {
-                    members = updatedList;
-                    MembersChanged?.Invoke(this, null);
-                    return;
-                }
-                UpdateMemberFailed?.Invoke(this, "The creation was successful, but we can no longer get an updated list of members from the server.");
-            }
-
-            UpdateMemberFailed?.Invoke(this, "Unable to create record.");
+            return await _httpClient.PutJsonAsync<UpdateMemberCommandResult>($"members/{command.Id}", command);
         }
 
         public void SelectMember(Guid id)
@@ -114,8 +73,8 @@ namespace WebClient.Services
 
         public async Task<FamilyMember[]> GetAllMembersList()
         {
-            var members = await httpClient.GetJsonAsync<GetAllMembersQueryResult>("members");
-            return members.Payload.Select(u => u.ToFamilyMember()).ToArray();
-        }
+            var members = await _httpClient.GetJsonAsync<GetAllMembersQueryResult>("members");
+            return members.Payload.Select(u => u.Map()).ToArray();
+        }        
     }
 }

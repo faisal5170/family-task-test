@@ -57,23 +57,23 @@
         <div class="row m-0 col-12 p-0">
             <Field class="col-6 custom-input">
                 <FieldLabel>First Name</FieldLabel>
-                <TextEdit @bind-Text="@member.FirstName"/>
+                <TextEdit @bind-Text="@member.firstname"/>
             </Field>
             <Field class="col-6 custom-input">
                 <FieldLabel>Last Name</FieldLabel>
-                <TextEdit @bind-Text="@member.LastName"/>
+                <TextEdit @bind-Text="@member.lastname"/>
             </Field>
         </div>
         <div class="row m-0 col-12 p-0">
             <Field class="col-12 custom-input">
                 <FieldLabel>Email Address</FieldLabel>
-                <TextEdit @bind-Text="@member.Email"/>
+                <TextEdit @bind-Text="@member.email"/>
             </Field>
         </div>
         <div class="row m-0 col-12 p-0">
             <Field class="col-12 custom-input">
                 <FieldLabel>Roles</FieldLabel>
-                <TextEdit @bind-Text="@member.Roles"/>
+                <TextEdit @bind-Text="@member.role"/>
             </Field>
         </div>
         <div class="row m-0 col-12 p-0">
@@ -86,16 +86,8 @@
                             <div class="avtar" @onclick="@(e => OnAvatarSelect(item))" style="background-color: @item;"></div>
                         }
                     </div>
-                    <div class="col-3 p-0 text-right">
-                        @if (member.Id == Guid.Empty)
-                        {
-                            <Button class="add-btn px-3" @onclick="@OnAddClick">Add Member</Button>
-                        }
-                        else
-                        {
-                            <Button class="add-btn px-3" @onclick="@OnUpdateClick">Update Member</Button>
-                        }
-                        
+                    <div class="col-3 p-0 text-right">                       
+                            <Button class="add-btn px-3" @onclick="@OnAddClick">Add Member</Button>      
                     </div>
                 </div>
             </Field>
@@ -105,37 +97,26 @@
 
 @code {
 
+    [Parameter] public EventCallback<FamilyMember> OnAddCallback { get; set; }
 
-    private MemberVm member;
     private string[] avatars = new string[] { "#FE4E4E", "#FEB84E", "#FEEC4E", "#3EC732", "#4EFEF3", "#4E7FFE", "#E54EFE", "#C17216" };
-
-    protected override Task OnInitializedAsync()
+    private FamilyMember member = new FamilyMember
     {
-        member = memberDataService.SelectedMember ?? new MemberVm();
-        memberDataService.SelectedMemberChanged += MemberDataServiceOnSelectedMemberChanged;
-        return base.OnInitializedAsync();
-    }
-
-    private void MemberDataServiceOnSelectedMemberChanged(object sender, EventArgs e)
-    {
-        member = memberDataService.SelectedMember ?? new MemberVm();
-
-        StateHasChanged();
-    }
-
-    private void OnUpdateClick()
-    {
-        memberDataService.UpdateMember(member);
-    }
-
-    private void OnAddClick()
-    {
-        memberDataService.CreateMember(member);
-    }
+        firstname = "",
+        lastname = "",
+        avtar = "",
+        email = "",
+        role = ""
+    };
 
     private void OnAvatarSelect(string item)
     {
-        member.Avatar = item;
+        member.avtar = item;
+    }
+
+    private async void OnAddClick()
+    {
+        await OnAddCallback.InvokeAsync(member);
     }
 
 }

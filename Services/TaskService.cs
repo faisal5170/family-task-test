@@ -34,7 +34,7 @@ namespace Services
                 var persistedTask = await _taskRepository.CreateRecordAsync(task);
 
                 var vm = _mapper.Map<TaskVm>(persistedTask);
-                if (persistedTask.AssignedToId != null || persistedTask.AssignedToId != Guid.Empty)
+                if (persistedTask.AssignedToId != null && persistedTask.AssignedToId != Guid.Empty)
                 {
                     vm.Member = await _memberRepository.ByIdAsync(persistedTask.AssignedToId.Value);
                     vm.Member.Tasks = null;

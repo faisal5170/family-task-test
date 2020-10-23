@@ -55,7 +55,7 @@
 
     @foreach (var item in Tasks)
     {
-        <div class="task-item p-3 my-3 row m-0">
+        <div draggable="true" id="@item.id" class="task-item p-3 my-3 row m-0">
             <div class="col-10 p-0">
                 <Check TValue="bool" Checked="@item.isDone" CheckedChanged="@(val => ToggleTask(item,val))">
                     <span class="@(item.isDone ? "done-text" : "")">@item.text</span>

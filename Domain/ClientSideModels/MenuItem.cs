@@ -18,7 +18,7 @@ namespace Domain.ClientSideModels
             }
         }
         public event EventHandler<object> ClickCallback;
-        public void InvokClickCallback(object e)
+        public void InvokeClickCallback(object e)
         {
             OnClickCallback(e);
         }

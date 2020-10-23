@@ -6,18 +6,19 @@
 <div id="@Menu.referenceId" class="@(Menu.referenceId == Guid.Empty ? "" : "drop-menu") menu-item col-10 offset-1 p-3 my-4 p-sm-2 @(Menu.isActive ? "active" : "")" @onclick="@(e => Menu.InvokeClickCallback(Menu))">
     @if (Menu.iconColor != null)
     {
-        <div class="avtar mr-3" style="background-color: @(Menu.iconColor);"> </div>
-    }
+<div class="avtar mr-3" style="background-color: @(Menu.iconColor);"> </div>}
     <div class="label"> @Menu.label </div>
+
     @if (Menu.referenceId != Guid.Empty)
     {
-        <div id="dropZone@(Menu.referenceId)" style="display:none" class="menu-item col-6 offset-1 p-3 my-4 p-sm-2">Drop here</div>
+        <div id="dropZone@(Menu.referenceId)" style="display:none" class="menu-item col-6 offset-1 p-3 my-4 p-sm-2">Drop task</div>
     }
+
+
 </div>
 
 
-@code { 
-    [Parameter] public MenuItem Menu { get; set; }
+@code { [Parameter] public MenuItem Menu { get; set; }
     [Parameter] public EventCallback<TaskVm> TaskDropCallback { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,10 +39,12 @@
     [JSInvokable]
     public async Task AssignTaskToMember(string taskId, string memberId)
     {
+
         await TaskDropCallback.InvokeAsync(new TaskVm
         {
             AssignedToId = Guid.Parse(memberId),
             Id = Guid.Parse(taskId)
         });
-    }
-}
+
+
+    } }

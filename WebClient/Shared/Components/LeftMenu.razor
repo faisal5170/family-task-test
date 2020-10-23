@@ -102,6 +102,7 @@
 <div class="menu-wrapper col-12 p-0">
     @if (MenuItems != null && MenuItems.Length > 0)
     {
+        <input type="hidden" id="dragTaskId" />
         @foreach (var item in MenuItems)
         {
             <LeftMenuDetail TaskDropCallback="TaskOnDrop" Menu="@item"></LeftMenuDetail>
@@ -120,60 +121,7 @@
 
     [Parameter] public EventCallback<TaskVm> TaskAssignedCallback { get; set; }
 
-    // protected override Task OnInitializedAsync()
-    // {
-    //     LoadMenus();
-    //     memberService.MembersChanged += MemberServiceOnMembersChanged;
-    //     memberService.SelectedMemberChanged += MemberServiceOnSelectedMemberChanged;
-
-    //     if (memberService.SelectedMember != null)
-    //     {
-    //         SetActiveItem(memberService.SelectedMember.Id);
-    //     }
-
-    //     return base.OnInitializedAsync();
-    // }
-
-    // private void MemberServiceOnSelectedMemberChanged(object sender, EventArgs e)
-    // {
-    //     InactivateAllItems();
-    //     if (memberService.SelectedMember != null)
-    //         SetActiveItem(memberService.SelectedMember.Id);
-    //     StateHasChanged();
-    // }
-
-    // private void MemberServiceOnMembersChanged(object sender, EventArgs e)
-    // {
-    //     LoadMenus();
-    //     StateHasChanged();
-    // }
-
-    //private void InactivateAllItems()
-    // {
-
-    //     foreach (var menuItem in MenuItems)
-    //     {
-    //         menuItem.isActive = false;
-    //     }
-    // }
-
-    // private void SetActiveItem(Guid id)
-    // {
-    //     foreach (var menuItem in MenuItems)
-    //     {
-    //         if (menuItem.referenceId == id)
-    //         {
-    //             menuItem.isActive = true;
-    //         }
-    //     }
-    // }
-
-    // void SelectMember(Guid id)
-    // {
-    //     memberService.SelectMember(id);
-    //     StateHasChanged();
-    // }
-
+  
     public async Task TaskOnDrop(TaskVm task)
     {
         await taskDataService.AssignTaskToMember(task.Id.ToString(), task.AssignedToId.ToString());
